@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <h1>Hello Page on my Flask Website</h1>
+  <a href="/">Main Page</a><br>
+  <a href="{{ url_for('hello')}}">Hello Page</a>
+  <h2>Messages</h2>
+  <form action="/add_message" method="post">
+    <input type="text" name="text">
+    <input type="text" name="tag">
+    <button type="submit" name="button">Add Message</button>
+  </form>
+  <h3>Messages list</h3>
+
+  {% for message in messages %}
+  <div>{{ message.text }}&nbsp<b>#{{ message.tag }}</b></div>
+  {% endfor %}
+
+</body>
+
+</html>
