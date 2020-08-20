@@ -28,6 +28,6 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255), nullable=False)
 
 
-@login_manager.user_loader
+@manager.user_loader
 def load_user(user, id):
     return User.get(user_id)

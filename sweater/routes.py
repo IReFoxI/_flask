@@ -1,10 +1,9 @@
 from flask import request, render_template, redirect, url_for, flash
-from flask_login import login_user
-from werkzeug.security import chech_password_hash
+from flask_login import login_user, login_required, logout_user
+from werkzeug.security import check_password_hash, generate_password_hash
 
-from models import User
 from sweater import app, db
-from sweater.models import Message
+from sweater.models import Message, User
 
 
 @app.route('/', methods=['GET'])
@@ -13,11 +12,13 @@ def index():
 
 
 @app.route('/hello', methods=['GET'])
+@login_required
 def hello():
     return render_template('hello.html', messages=Message.query.all())
 
 
 @app.route('/add_message', methods=['POST'])
+@login_required
 def add_message():
     text = request.form['text']
     tag = request.form['tag']
@@ -35,7 +36,7 @@ def login_page():
 
     if login and password:
         user = User.query.filter_by(login=login).first()
-        if chech_password_hash(user.password, password):
+        if check_password_hash(user.password, password):
             login_user(user)
 
             next_page = request.args.get('next')
@@ -43,14 +44,42 @@ def login_page():
             redirect(next_page)
         else:
             flash('Login or password is incorrect')
+
     else:
         flash('Please enter the correct login and password')
 
-        return render_template('index.html')
+        return render_template('login.html')
 
 @app.route('/register', methods=['GET','POST'])
 def register():
-    pass
+    login = request.form.get('login')
+    password = request.form.get('password')
+    password2 = request.form.get('password2')
+
+    if request.method == 'POST':
+        if not (login or password or password2):
+            flash('Please, fill all fields')
+        elif password != password2:
+            flash('Passwords are not equal')
+        else:
+            hash_pwd = generate_password_hash(password)
+            new_user = User(login=login, password=hash_pwd)
+            db.session.add(new_user)
+            db.session.commit()
+
+            return redirect(url_for('login_page'))
+
+    return render_template('register.html')
+
 @app.route('/logout', methods=['GET','POST'])
+@login_required
 def logout():
-    pass
+    logout_user()
+    return redirect(url_for('index'))
+
+
+@app.after_request
+def redirect_to_signin(responce):
+    if responce.status_code == 401:
+        return redirect(url_for('login_page') + '?next=' + request.url)
+    return responce

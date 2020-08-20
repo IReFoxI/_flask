@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
 app = Flask(__name__)
+app.secret_key = 'some secret salt_555'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:654321qweR@localhost/flask_chat'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
