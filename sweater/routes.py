@@ -10,7 +10,6 @@ from sweater.models import Message, User
 def index():
     return render_template('index.html')
 
-
 @app.route('/hello', methods=['GET'])
 @login_required
 def hello():
@@ -36,19 +35,19 @@ def login_page():
 
     if login and password:
         user = User.query.filter_by(login=login).first()
-        if check_password_hash(user.password, password):
+        if user and check_password_hash(user.password, password):
             login_user(user)
 
-            next_page = request.args.get('next')
+            # next_page = request.args.get('next')
 
-            redirect(next_page)
+            return redirect(url_for('hello'))
         else:
             flash('Login or password is incorrect')
 
     else:
         flash('Please enter the correct login and password')
 
-        return render_template('login.html')
+    return render_template('login.html')
 
 @app.route('/register', methods=['GET','POST'])
 def register():

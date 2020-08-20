@@ -29,5 +29,5 @@ class User(db.Model, UserMixin):
 
 
 @manager.user_loader
-def load_user(user, id):
-    return User.get(user_id)
+def load_user(user_id):
+    return User.query.get(user_id)
